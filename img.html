@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Converter Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #000;
+      margin: 0;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 1rem;
+      border-radius: 10px;
+      background: #e6f0ff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #007BFF;
+      text-align: center;
+    }
+    input[type="file"], select {
+      width: 100%;
+      margin: 0.5rem 0;
+    }
+    button {
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    img {
+      max-width: 100%;
+      margin-top: 1rem;
+      border-radius: 8px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 0.5rem;
+    }
+    a.download-link {
+      display: block;
+      margin-top: 1rem;
+      color: #007BFF;
+      text-decoration: underline;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Image Converter</h2>
+    <input type="file" id="imageInput" accept="image/*">
+    <label for="format">Convert to:</label>
+    <select id="format">
+      <option value="image/png">PNG</option>
+      <option value="image/jpeg">JPEG</option>
+      <option value="image/webp">WEBP</option>
+    </select>
+    <button onclick="convertImage()">Convert Image</button>
+    <div id="previewContainer"></div>
+    <a id="downloadLink" class="download-link" style="display:none;">Download Converted Image</a>
+  </div>  <script>
+    function convertImage() {
+      const fileInput = document.getElementById('imageInput');
+      const format = document.getElementById('format').value;
+      const previewContainer = document.getElementById('previewContainer');
+      const downloadLink = document.getElementById('downloadLink');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Please select an image to convert.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
+            previewContainer.innerHTML = '';
+            const previewImg = document.createElement('img');
+            previewImg.src = url;
+            previewContainer.appendChild(previewImg);
+
+            downloadLink.href = url;
+            downloadLink.download = `converted.${format.split('/')[1]}`;
+            downloadLink.style.display = 'block';
+          }, format, 0.8);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  </script></body>
+</html>
